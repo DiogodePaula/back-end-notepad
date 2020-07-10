@@ -19,12 +19,12 @@ server.get('/', (req, res) => {
 
 server.get('/notepad', async (req, res) => {
     let notepad
-    await database.query(`SELECT * FROM notepad`, 
+    await database.query(`SELECT * FROM notepad;`, 
     {type: database.QueryTypes.SELECT})
         .then(note => {
             notepad = note;
         })
-        .cath(err => {
+        .catch(err => {
             return res.json(err);
         })
 
@@ -35,12 +35,22 @@ server.get('/notepad/:id', async (req, res) => {
     const {id} = req.params;
     let note;
 
-    await database.query(`SELECT * FROM notepad WHERE id = ${id}`, 
+    await database.query(`SELECT * FROM notepad WHERE id = ${id};`, 
     {type: database.QueryTypes.SELECT})
         .then(noteResult => {
             note = noteResult;
         })
-        .cath(err => {
+        .catch(err => {
             return res.json(err);
-    });
+        })
+        return res.json({note})
+})
+
+server.post('/notepad', async (req, res) => {
+    let inseriu;
+    const {id, title, content, date, hour} = req.body;
+
+    await database.query(`INSERT INTO notepad VALUES(${id}, '${title}', '${content}', '${date}', '${hour}');`,
+    {type: database.QueryTypes.INSERT})
+
 })

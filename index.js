@@ -5,7 +5,7 @@ server.use(express.json());
 
 //evitar erros de CORS
 server.use((req, res, next) => {
-    res.header('Access-Control-Aloow-Origin', '*');
+    res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
     res.header('Access-Control-Allow-Headers', 'Content-Type');
     next();
@@ -95,7 +95,7 @@ server.put('/notepad/:id', async (req, res) => {
         });
     }else {
         return res.json({
-            result: 'note cannnot be update.'
+            result: 'note cannot be update.'
         });
     }
 });

@@ -5,11 +5,13 @@ server.use(express.json());
 
 //evitar erros de CORS
 server.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Origin', "*");
     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
     res.header('Access-Control-Allow-Headers', 'Content-Type');
     next();
 });
+
+let nextId = null;
 
 server.get('/', (req, res) => {
     return res.json({
@@ -17,12 +19,23 @@ server.get('/', (req, res) => {
     });
 });
 
+async function getNextId(req, res, next) {
+    await database.query(`SELECT MAX(id) FROM notepad;`,
+    {type: database.QueryTypes.SELECT})
+    .then(id => {
+        nextId = id[0].max++;
+        nextId ++;
+    });
+    next();
+}
+
 server.get('/notepad', async (req, res) => {
-    let notepad
+    let notepad;
+
     await database.query(`SELECT * FROM notepad;`, 
     {type: database.QueryTypes.SELECT})
-        .then(note => {
-            notepad = note;
+        .then(notes => {
+            notepad = notes;
         })
         .catch(err => {
             return res.json(err);
@@ -46,26 +59,27 @@ server.get('/notepad/:id', async (req, res) => {
         return res.json({note})
 });
 
-server.post('/notepad', async (req, res) => {
+server.post('/notepad', getNextId, async (req, res) => {
     let inseriu;
-    const {id, title, content, date, hour} = req.body;
+    const {title, content, date, hour} = req.body;
 
-    await database.query(`INSERT INTO notepad VALUES(${id}, '${title}', '${content}', '${date}', '${hour}');`,
+    await database.query(`INSERT INTO notepad VALUES(${nextId}, '${title}', 
+    '${content}', '${date}', '${hour}');`,
     {type: database.QueryTypes.INSERT})
         .then(result => {
             inseriu = result;
         })
-        .catch(erro => {
-            return res.json(erro);
+        .catch(err => {
+            return res.json(err);
         });
 
     if (inseriu[1]) {
         return res.json({
-            result: 'note successfully inserted.'
+            result: 'note successfully inserted.' 
         });
     } else  {
         return res.json({
-            result: 'note could note be registered'
+            result: 'note could note be registered' 
         });
     }
 
@@ -89,15 +103,15 @@ server.put('/notepad/:id', async (req, res) => {
             return res.json(erro);
         })
 
-    if (update[1]){
-        return res.json({
-            result: 'note update successfully.'
-        });
-    }else {
-        return res.json({
-            result: 'note cannot be update.'
-        });
-    }
+    // if (update[1]){
+    //     return res.json({
+    //         result: 'note update successfully.'
+    //     });
+    // }else {
+    //     return res.json({
+    //         result: 'note cannot be update.'
+    //     });
+    // }
 });
 
 server.delete('/notepad/:id', async (req, res) => {
@@ -113,4 +127,4 @@ server.delete('/notepad/:id', async (req, res) => {
     })
 });
 
-server.listen(process.env.PORT);
+server.listen(process.env.PORT); 

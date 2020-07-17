@@ -25,7 +25,8 @@ async function getNextId(req, res, next) {
     .then(id => {
         nextId = id[0].max++;
         nextId ++;
-    });
+    })
+    
     next();
 }
 
@@ -42,7 +43,7 @@ server.get('/notepad', async (req, res) => {
         })
 
     return res.json({notepad});
-});
+})
 
 server.get('/notepad/:id', async (req, res) => {
     const {id} = req.params;
@@ -56,8 +57,8 @@ server.get('/notepad/:id', async (req, res) => {
         .catch(err => {
             return res.json(err);
         })
-        return res.json({note})
-});
+        return res.json({note});
+})
 
 server.post('/notepad', getNextId, async (req, res) => {
     let inseriu;
@@ -71,7 +72,7 @@ server.post('/notepad', getNextId, async (req, res) => {
         })
         .catch(err => {
             return res.json(err);
-        });
+        })
 
     if (inseriu[1]) {
         return res.json({
@@ -94,7 +95,7 @@ server.put('/notepad/:id', async (req, res) => {
     UPDATE notepad SET title = '${title}' WHERE id = ${id};
     UPDATE notepad SET content = '${content}' WHERE id = ${id};
     UPDATE notepad SET date = '${date}' WHERE id = ${id};
-    UPDATE notepad SET hour = '${hour}' WHERE id = ${id}`,
+    UPDATE notepad SET hour = '${hour}' WHERE id = ${id};`,
     {type: database.QueryTypes.UPDATE})
         .then(result => {
             update = result;
@@ -103,28 +104,31 @@ server.put('/notepad/:id', async (req, res) => {
             return res.json(erro);
         })
 
-    // if (update[1]){
-    //     return res.json({
-    //         result: 'note update successfully.'
-    //     });
-    // }else {
-    //     return res.json({
-    //         result: 'note cannot be update.'
-    //     });
-    // }
-});
+    if (update[1]){
+        return res.json({
+            result: 'note update successfully.'
+        });
+    }else {
+        return res.json({
+            result: 'note cannot be update.'
+        });
+    }
+})
 
 server.delete('/notepad/:id', async (req, res) => {
     const {id} = req.params;
 
     await database.query(`DELETE FROM notepad WHERE id = ${id};`,
-    {type: database.QueryTypes.DELETE})   
+    {type: database.QueryTypes.DELETE})
+    .then(result => {
+        return res.json(result);
+    })   
     .catch(err => {
         return res.json(err);
     })
     return res.json({
         result: 'note deleted!'
-    })
-});
+    });
+})
 
 server.listen(process.env.PORT); 

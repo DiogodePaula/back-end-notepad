@@ -92,10 +92,8 @@ server.put('/notepad/:id', async (req, res) => {
     let update;
 
     await database.query(`
-    UPDATE notepad SET title = '${title}' WHERE id = ${id};
-    UPDATE notepad SET content = '${content}' WHERE id = ${id};
-    UPDATE notepad SET date = '${date}' WHERE id = ${id};
-    UPDATE notepad SET hour = '${hour}' WHERE id = ${id};`,
+    UPDATE notepad SET title = '${title}', content = '${content}',
+    date= '${date}', hour= '${hour}' WHERE id = ${id};`,
     {type: database.QueryTypes.UPDATE})
         .then(result => {
             update = result;
@@ -119,10 +117,7 @@ server.delete('/notepad/:id', async (req, res) => {
     const {id} = req.params;
 
     await database.query(`DELETE FROM notepad WHERE id = ${id};`,
-    {type: database.QueryTypes.DELETE})
-    .then(result => {
-        return res.json(result);
-    })   
+    {type: database.QueryTypes.DELETE})   
     .catch(err => {
         return res.json(err);
     })

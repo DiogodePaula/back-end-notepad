@@ -93,7 +93,7 @@ server.put('/notepad/:id', async (req, res) => {
 
     await database.query(`
     UPDATE notepad SET title = '${title}', content = '${content}',
-    date= '${date}', hour= '${hour}' WHERE id = ${id};`,
+    date = '${date}', hour = '${hour}' WHERE id = ${id};`,
     {type: database.QueryTypes.UPDATE})
         .then(result => {
             update = result;
